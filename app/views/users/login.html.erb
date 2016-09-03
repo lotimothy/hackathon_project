@@ -1,0 +1,63 @@
+<% content_for :title, 'Sign-in Page' %>
+    <script src="https://www.gstatic.com/firebasejs/3.3.0/firebase.js"></script>
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyAPB3T3HXYbzBU-Mck31Luxs6jvjBKBwC0",
+    authDomain: "fitgame-project.firebaseapp.com",
+    databaseURL: "https://fitgame-project.firebaseio.com",
+    storageBucket: "fitgame-project.appspot.com"
+  };
+  firebase.initializeApp(config);
+</script>
+    <script src="//www.gstatic.com/firebasejs/ui/live/0.4/firebase-ui-auth.js"></script>
+    <link type="text/css" rel="stylesheet" href="//www.gstatic.com/firebasejs/ui/live/0.4/firebase-ui-auth.css" />
+    <script type="text/javascript">
+      // FirebaseUI config.
+      var uiConfig = {
+        'signInSuccessUrl': '<url-to-redirect-to-on-success>',
+        'signInOptions': [
+          // Leave the lines as is for the providers you want to offer your users.
+          firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+          firebase.auth.FacebookAuthProvider.PROVIDER_ID,
+          firebase.auth.TwitterAuthProvider.PROVIDER_ID,
+          firebase.auth.GithubAuthProvider.PROVIDER_ID,
+          firebase.auth.EmailAuthProvider.PROVIDER_ID
+        ],
+        // Terms of service url.
+        'tosUrl': '<your-tos-url>',
+        'callbacks': {
+			'signInSuccess': function(currentUser, credential, redirectUrl) {
+					var data = {
+						'user[handle]': currentUser.displayName,
+						'user[email]': currentUser.email,
+						'user[firebase_id]': currentUser.uid,
+						'user[avatar]': currentUser.photoURL
+					};
+					$.post(
+						'/users',
+						data,
+						function(response) {
+							console.log(response);
+							if(response.success) {
+								window.location.replace('/dashboard');
+							}
+						},
+						'json'
+					);
+					return false;
+				}
+			}
+      };
+
+      // Initialize the FirebaseUI Widget using Firebase.
+      var ui = new firebaseui.auth.AuthUI(firebase.auth());
+      // The start method will wait until the DOM is loaded.
+      ui.start('#firebaseui-auth-container', uiConfig);
+    </script>
+    <!-- The surrounding HTML is left untouched by FirebaseUI.
+         Your app may use that space for branding, controls and other customizations.-->
+    <div class="row">
+      <h2>Please login</h2>
+    </div>
+    <div id="firebaseui-auth-container"></div>
